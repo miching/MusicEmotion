@@ -4,8 +4,19 @@ import pathlib
 from deepface import DeepFace
 import time
 from collections import Counter
-import pyrebase
+from pymongo import MongoClient
 
+import os
+from dotenv import load_dotenv
+from pathlib import Path
+
+#Path to config.env which contains MongoDBLink (enviorment variables)
+dotenv_path = Path('config.env')
+load_dotenv(dotenv_path=dotenv_path)
+
+#Get env varaibles - hide MongoDB Link
+connectMongoLink = os.getenv("MONGO_LINK")
+#print('info:',connectMongoLink)
 
 
 app = Flask(__name__)
@@ -17,10 +28,19 @@ video_capture = cv2.VideoCapture(0)
 #Most shown emotion
 totalEmotion = []
 
+#MongoDB
+client = MongoClient(connectMongoLink)
+
+# Create a MongoDB database called ratingsList
+db = client.MusicEmotion
+
+# Create a collection called items on the database
+# Collections store a group of documents in MongoDB, like tables in relational databases.
+collectionItems = db.moods
 
 
-data = {'moods': ['sad','happy']}
-db.push(data)
+#data = {'moods': ['sad','happy']}
+#db.push(data)
 
 def camera():
 
@@ -77,20 +97,22 @@ def camera():
 
 
 
-@app.route('/')
+@app.route('/', methods = ['GET','POST'])
 def index():  # put application's code here
+
+    #if request.method == 'POST':
+        #if request.form['cameraFunction'] == 'Stop':
+            #return redirect('/results')
+            #return render_template('results.html')
+
     return render_template('index.html')
 
 
-@app.route('/emotion', methods = ['GET','POST'])
+
+@app.route('/emotion')
 def captureEmotion():
 
-    if request.method == 'POST':
-       if request.form['cameraFunction'] == 'Stop':
-            return redirect('/results')
-
-    else:
-        return Response(camera(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(camera(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 
@@ -102,7 +124,7 @@ def results():
 
     #Get most shown emotion through the recording
     occurence_count = Counter(totalEmotion)
-    print(occurence_count.most_common(1)[0][0])
+    print(occurence_count.most_common(1)[0])
 
 
     #if request.method == 'POST':
@@ -113,4 +135,5 @@ def results():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    #app.run()
+    app.run(host='127.0.0.1', port=8002, debug=True,threaded=True)
