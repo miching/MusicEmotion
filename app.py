@@ -104,9 +104,8 @@ def camera():
 def index():  # put application's code here
 
     if request.method == 'POST':
-        if request.form['cameraFunction'] == 'Stop':
-            #return redirect('/results')
-            return render_template('results.html')
+        return redirect('/results')
+
 
     return render_template('index.html')
 
@@ -115,42 +114,58 @@ def index():  # put application's code here
 @app.route('/emotion')
 def captureEmotion():
 
+    time.sleep(20)
     return Response(camera(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 
-@app.route('/results')
+@app.route('/results', methods = ['GET','POST'])
 def results():
 
-    cv2.destroyAllWindows()
-
-
-    #Get most shown emotion through the recording
-    occurence_count = Counter(totalEmotion)
-    print(occurence_count.most_common(1)[0])
-    mostShownEmotion = occurence_count.most_common(1)[0]
-
-    mostShownEmotion = 'angry'
-
-    #previousEmotions = collectionMoods.collectionItems.find_one({"user": 'mike'})
-    # addEmotionHistory = previousEmotions['moods'].append(mostShownEmotion)
-    # previousEmotions.update_one({'user': 'mike'}, {"$set": })
-    #print(previousEmotions)
-
-    #Update DB with latest emotion
-    collectionMoods.update_one({'_id': 'mike'}, {'$set': {'moods': mostShownEmotion}})
-
-
-    print('here')
-
     if request.method == 'POST':
-       if request.form['cameraFunction'] == 'Capture':
-           return redirect('/')
-            #return render_template('index.html')
+        return ('empty')
+        print('reaches here but nothing')
+        print('reaches here but nothing6')
 
-    return render_template('results.html')
+        # Get most shown emotion through the recording
+        occurence_count = Counter(totalEmotion)
+        print(occurence_count.most_common(1)[0])
+        mostShownEmotion = occurence_count.most_common(1)[0]
+
+        mostShownEmotion = 'angry'
+
+        previousEmotions = collectionMoods.collectionItems.find_one({"_id": 'mike'})
+        emotionHistory = previousEmotions['moods'].append(mostShownEmotion)
+        # previousEmotions.update_one({'user': 'mike'}, {"$set": })
+        # print(previousEmotions)
+
+        # Update DB with latest emotion
+        collectionMoods.update_one({'_id': 'mike'}, {'$set': {'moods': mostShownEmotion}})
+
+        print('here')
+
+        # if request.method == 'POST':
+        # if request.form['cameraFunction'] == 'Capture':
+        # return redirect('/')
+        # return render_template('index.html')
+        return('/')
+    else:
+
+        mostShownEmotion = 'angry'
+        #previousEmotions = collectionMoods.collectionItems.find_one({'_id': 'mike'})
+        #emotionHistory = previousEmotions['moods'].append(mostShownEmotion)
+        emotionHistory = ['angry', 'happy', 'sad']
+
+
+        collectionMoods.update_one({'_id': 'mike'}, {'$push': {'moods': emotionHistory}})
+        print('tesing reachability')
+        return render_template('results.html', moodHistory = emotionHistory)
+
+    #else:
+        #return('here')
 
 
 if __name__ == '__main__':
-    app.run()
+    FLASK_DEBUG = 1
+    app.run(debug=True)
     #app.run(host='127.0.0.1', port=8002, debug=True,threaded=True)
