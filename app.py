@@ -23,7 +23,7 @@ app = Flask(__name__)
 #Default training data provided by CV2 for facial recog
 cascPath = pathlib.Path(cv2.__file__).parent.absolute() / 'data/haarcascade_frontalface_default.xml'
 faceCascade = cv2.CascadeClassifier(str(cascPath))
-video_capture = cv2.VideoCapture(0)
+#video_capture = cv2.VideoCapture(0)
 
 #Most shown emotion
 totalEmotion = []
@@ -37,8 +37,11 @@ db = client.MusicEmotion
 # Create a collection called items on the database
 # Collections store a group of documents in MongoDB, like tables in relational databases.
 collectionMoods = db.moods
-
-
+try:
+    test = {'_id': 'mike', 'moods': ['sad','happy']}
+    collectionMoods.insert_one(test)
+except:
+    pass
 #data = {'moods': ['sad','happy']}
 #db.push(data)
 
@@ -118,23 +121,32 @@ def captureEmotion():
 
 @app.route('/results')
 def results():
-    #video_capture.release()
-    #cv2.destroyAllWindows()
+
+    cv2.destroyAllWindows()
 
 
     #Get most shown emotion through the recording
     occurence_count = Counter(totalEmotion)
     print(occurence_count.most_common(1)[0])
+    mostShownEmotion = occurence_count.most_common(1)[0]
+
+    mostShownEmotion = 'angry'
+
+    #previousEmotions = collectionMoods.collectionItems.find_one({"user": 'mike'})
+    # addEmotionHistory = previousEmotions['moods'].append(mostShownEmotion)
+    # previousEmotions.update_one({'user': 'mike'}, {"$set": })
+    #print(previousEmotions)
+
+    #Update DB with latest emotion
+    collectionMoods.update_one({'_id': 'mike'}, {'$set': {'moods': mostShownEmotion}})
 
 
-    previousEmotions = collectionMoods.collectionItems.find_one({"user": 'mike'})
-    print(previousEmotions)
-    #previousEmotions.update_one({'user': 'mike'}, {"$set": newEmotion})
+    print('here')
 
-
-    #if request.method == 'POST':
-       #if request.form['cameraFunction'] == 'Capture':
-           #return redirect('/')
+    if request.method == 'POST':
+       if request.form['cameraFunction'] == 'Capture':
+           return redirect('/')
+            #return render_template('index.html')
 
     return render_template('results.html')
 
