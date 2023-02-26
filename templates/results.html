@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results</title>
+</head>
+<body>
+
+    <h1>Emotion Results</h1>
+    <div>
+
+        <link rel="stylesheet" href = "{{ url_for('static', filename = 'css/main.css') }}">
+        <table id = 'myTable'>
+            <tr>
+
+                <!-- Table rows -->
+                <th>Emotion History</th>
+
+            </tr>
+
+            {% for mood in moodHistory%}
+                <tr>
+                    <td>{{ mood }}</td>
+
+                </tr>
+            {% endfor %}
+        </table>
+
+        <form action = '/results', method="POST">
+            <input type = "submit", name = 'cameraFunction', value = "Capture">
+        </form>
+    </div>
+
+</body>
+</html>
