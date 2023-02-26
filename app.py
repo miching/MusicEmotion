@@ -38,7 +38,7 @@ db = client.MusicEmotion
 # Collections store a group of documents in MongoDB, like tables in relational databases.
 collectionMoods = db.moods
 try:
-    test = {'_id': 'mike', 'moods': ['sad','happy']}
+    test = {'_id': 'mike', 'moods': []}
     collectionMoods.insert_one(test)
 except:
     pass
@@ -124,35 +124,54 @@ def results():
 
     if request.method == 'POST':
         return(redirect('/'))
-        return ('empty')
-        print('reaches here but nothing')
-        print('reaches here but nothing6')
 
-        # Get most shown emotion through the recording
-        occurence_count = Counter(totalEmotion)
-        print(occurence_count.most_common(1)[0])
-        mostShownEmotion = occurence_count.most_common(1)[0]
-
-        mostShownEmotion = 'angry'
-
-        previousEmotions = collectionMoods.collectionItems.find_one({"_id": 'mike'})
-        emotionHistory = previousEmotions['moods'].append(mostShownEmotion)
-        # previousEmotions.update_one({'user': 'mike'}, {"$set": })
-        # print(previousEmotions)
-
-        # Update DB with latest emotion
-        collectionMoods.update_one({'_id': 'mike'}, {'$set': {'moods': mostShownEmotion}})
-
-        print('here')
-
-        # if request.method == 'POST':
-        # if request.form['cameraFunction'] == 'Capture':
-        # return redirect('/')
-        # return render_template('index.html')
-        return('/')
     else:
 
-        mostShownEmotion = 'disappointed'
+
+        #Get most shown emotion
+
+        angerCount = totalEmotion.count('anger')
+        fearCount = totalEmotion.count('fear')
+        sadCount = totalEmotion.count('sad')
+        disgustCount = totalEmotion.count('disgust')
+        happyCount = totalEmotion.count('happy')
+        surprisedCount = totalEmotion.count('surprised')
+
+        emotionCount = []
+        emotionCount.append(angerCount)
+        emotionCount.append(fearCount)
+        emotionCount.append(sadCount)
+        emotionCount.append(disgustCount)
+        emotionCount.append(happyCount)
+        emotionCount.append(surprisedCount)
+
+        highestCount = -1
+
+        for i in range(len(emotionCount)-1):
+            if emotionCount[i] > highestCount:
+                highestCount = emotionCount[i]
+
+
+        if(highestCount == angerCount):
+            mostShownEmotion = 'anger'
+        elif(highestCount == fearCount):
+            mostShownEmotion = 'fear'
+        elif (highestCount == sadCount):
+            mostShownEmotion = 'sad'
+        elif (highestCount == disgustCount):
+            mostShownEmotion = 'disgust'
+        elif (highestCount == happyCount):
+            mostShownEmotion = 'happy'
+        else:
+            mostShownEmotion = 'surprised'
+
+
+
+        #occurence_count = Counter(totalEmotion)
+        #print(occurence_count.most_common(1)[0])
+        #mostShownEmotion = occurence_count.most_common(1)[0]
+
+        #mostShownEmotion = 'disappointed'
         previousEmotions = collectionMoods.find_one({'_id': "mike"})
         print(previousEmotions)
 
