@@ -1,7 +1,6 @@
-import pathlib
-
 from flask import Flask, render_template, Response
 import cv2
+import pathlib
 from deepface import DeepFace
 
 app = Flask(__name__)
@@ -16,7 +15,37 @@ def camera():
         # Capture frame-by-frame
         ret, frame = video_capture.read()
         result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
-        print(result)
+        #print(result)
+
+        # Color scale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,  # Things not facial
+            minSize=(30, 30),
+            flags=cv2.CASCADE_SCALE_IMAGE
+        )
+
+        # Draw a rectangle around the faces
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+            cv2.putText(frame, result[0]['dominant_emotion'], (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12),
+                        2)
+
+        #cv2.imshow('Emotion', frame)
+
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame=buffer.tobytes()
+
+        yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+
+
 
 @app.route('/')
 def index():  # put application's code here
