@@ -2,7 +2,7 @@ import pathlib
 from deepface import DeepFace
 from spotipy.oauth2 import SpotifyOAuth
 import spotipy
-from flask import Flask, render_template, url_for, redirect, request, session
+from flask import Flask, render_template, url_for, redirect, request, session,Response
 import cv2
 import time
 from collections import Counter
@@ -58,11 +58,9 @@ except:
 
 
 def camera():
-    #Run for 10 seconds
-    t_end = time.time() + 10
+
     video_capture = cv2.VideoCapture(0)
-    #Keep capturing till time over
-    #while time.time() < t_end:
+
     # While cam is on
     while True:
         # Capture frame-by-frame
@@ -160,7 +158,7 @@ def queueDisplay():
 @app.route('/', methods=['GET', 'POST'])
 def homepage():
     if request.method == 'POST':
-        return redirect(url_for('login', _external=True))
+        return redirect(url_for('index', _external=True))
     else:
         return render_template("homepage.html")
 
@@ -189,8 +187,8 @@ def get_token():
 
 def create_spotify_oauth():
     return SpotifyOAuth(
-        client_id="701d5036b2b4465eb0254db1f4d67056",
-        client_secret="93d4504616194679a6ee5ab445204bed",
+        client_id="bf1c506468d14e739f5f67aa22476750",
+        client_secret="3dfc15d292554e36a037e8649d3dc755",
         redirect_uri=url_for('authorize', _external=True),
         scope="user-library-read")
 
@@ -199,11 +197,8 @@ def create_spotify_oauth():
 
 @app.route('/cam', methods = ['GET','POST'])
 def index():  # put application's code here
-
     if request.method == 'POST':
         return redirect('/results')
-
-
     return render_template('index.html')
 
 
