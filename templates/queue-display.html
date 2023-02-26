@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <link rel="stylesheet" href = "{{ url_for('static', filename = 'css/homepage.css') }}">
+      <title>EmotionMusic</title>
+  </head>
+  <body>
+    <header>
+      <h1>Welcome to EmotionMusic</h1>
+    </header>
+    <main>
+        <div id="song-queue" style="overflow: scroll; height: 300px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Artist</th>
+              </tr>
+            </thead>
+            <tbody style="background-color: white">
+
+{#              {% for song in songs['items'] %}#}
+{#                <tr>#}
+{#                  <td>{{ song['track']['name'] }}</td>#}
+{#                  <td>{{ song['track']['artists'][0]['name'] }}</td>#}
+{#                </tr>#}
+{#              {% endfor %}#}
+            </tbody>
+          </table>
+        </div>
+      <button>
+          <form action = '/', method="POST">
+            <input type = "submit", name = 'logoutButton', value = "Logout of Spotify Account">
+        </form>
+      </button>
+    </main>
+  </body>
+</html>
+
+

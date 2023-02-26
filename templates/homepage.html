@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <link rel="stylesheet" href = "{{ url_for('static', filename = 'css/homepage.css') }}">
+      <title>EmotionMusic</title>
+  </head>
+  <body>
+    <header>
+      <h1>Welcome to EmotionMusic</h1>
+    </header>
+    <main>
+      <p>Our site has the power to read your facial expressions and
+          determine a playlist based on your current emotions</p>
+      <p>To get started, login to Spotify so we can link your account</p>
+      <button>
+          <form action = '/', method="POST">
+            <input type = "submit", name = 'loginButton', value = "Spotify Login">
+        </form>
+      </button>
+    </main>
+  </body>
+</html>

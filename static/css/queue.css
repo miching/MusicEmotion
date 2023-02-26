@@ -1,0 +1,34 @@
+.song-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.song {
+  width: calc(33.33% - 20px);
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.song img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.song h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.song p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
