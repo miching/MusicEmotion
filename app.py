@@ -1,5 +1,5 @@
 import pathlib
-# from deepface import DeepFace
+from deepface import DeepFace
 from spotipy.oauth2 import SpotifyOAuth
 import spotipy
 from flask import Flask, render_template, url_for, redirect, request, session
@@ -34,6 +34,7 @@ cascPath = pathlib.Path(cv2.__file__).parent.absolute() / 'data/haarcascade_fron
 faceCascade = cv2.CascadeClassifier(str(cascPath))
 #video_capture = cv2.VideoCapture(0)
 
+
 #Most shown emotion
 totalEmotion = []
 
@@ -42,6 +43,7 @@ client = MongoClient(connectMongoLink)
 
 # Create a MongoDB database called ratingsList
 db = client.MusicEmotion
+
 
 # Create a collection called items on the database
 # Collections store a group of documents in MongoDB, like tables in relational databases.
@@ -53,6 +55,57 @@ except:
     pass
 #data = {'moods': ['sad','happy']}
 #db.push(data)
+
+
+def camera():
+    #Run for 10 seconds
+    t_end = time.time() + 10
+    video_capture = cv2.VideoCapture(0)
+    #Keep capturing till time over
+    #while time.time() < t_end:
+    # While cam is on
+    while True:
+        # Capture frame-by-frame
+        ret, frame = video_capture.read()
+        result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
+        #print(result)
+
+        # Color scale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,  # Things not facial
+            minSize=(30, 30),
+            flags=cv2.CASCADE_SCALE_IMAGE
+        )
+
+        # Draw a rectangle around the faces
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+            cv2.putText(frame, result[0]['dominant_emotion'], (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12),
+                        2)
+
+            totalEmotion.append(result[0]['dominant_emotion'])
+
+        #cv2.imshow('Emotion', frame)
+
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame=buffer.tobytes()
+
+        if frame != None:
+            global_frame = frame
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+        yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+    # When everything is done, release the capture
+    video_capture.release()
+    cv2.destroyAllWindows()
 
 
 @app.route('/logout')
@@ -140,58 +193,6 @@ def create_spotify_oauth():
         client_secret="93d4504616194679a6ee5ab445204bed",
         redirect_uri=url_for('authorize', _external=True),
         scope="user-library-read")
-
-
-def camera():
-    #Run for 10 seconds
-    t_end = time.time() + 10
-    video_capture = cv2.VideoCapture(0)
-    #Keep capturing till time over
-    #while time.time() < t_end:
-    # While cam is on
-    while True:
-        # Capture frame-by-frame
-        ret, frame = video_capture.read()
-        result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
-        #print(result)
-
-        # Color scale
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-        faces = faceCascade.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=5,  # Things not facial
-            minSize=(30, 30),
-            flags=cv2.CASCADE_SCALE_IMAGE
-        )
-
-        # Draw a rectangle around the faces
-        for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-            cv2.putText(frame, result[0]['dominant_emotion'], (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12),
-                        2)
-
-            totalEmotion.append(result[0]['dominant_emotion'])
-
-        #cv2.imshow('Emotion', frame)
-
-        ret, buffer = cv2.imencode('.jpg', frame)
-        frame=buffer.tobytes()
-
-        if frame != None:
-            global_frame = frame
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
-        yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-    # When everything is done, release the capture
-    video_capture.release()
-    cv2.destroyAllWindows()
-
 
 
 
