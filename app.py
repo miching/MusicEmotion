@@ -123,6 +123,7 @@ def captureEmotion():
 def results():
 
     if request.method == 'POST':
+        return(redirect('/'))
         return ('empty')
         print('reaches here but nothing')
         print('reaches here but nothing6')
@@ -151,14 +152,20 @@ def results():
         return('/')
     else:
 
-        mostShownEmotion = 'angry'
-        #previousEmotions = collectionMoods.collectionItems.find_one({'_id': 'mike'})
-        #emotionHistory = previousEmotions['moods'].append(mostShownEmotion)
-        emotionHistory = ['angry', 'happy', 'sad']
+        mostShownEmotion = 'disappointed'
+        previousEmotions = collectionMoods.find_one({'_id': "mike"})
+        print(previousEmotions)
+
+        emotionHistory = previousEmotions['moods']
+        emotionHistory.append(mostShownEmotion)
+        #print('BEFOREhistory',emotionHistory)
+        #print('history',emotionHistory)
+        #emotionHistory = ['angry', 'happy', 'sad','fear']
 
 
-        collectionMoods.update_one({'_id': 'mike'}, {'$push': {'moods': emotionHistory}})
-        print('tesing reachability')
+        #collectionMoods.update_one({'_id': 'mike'}, {'$push': {'moods': emotionHistory}})
+        collectionMoods.update_one({'_id': 'mike'}, {'$push': {'moods': mostShownEmotion}})
+
         return render_template('results.html', moodHistory = emotionHistory)
 
     #else:
