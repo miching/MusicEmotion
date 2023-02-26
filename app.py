@@ -17,9 +17,9 @@ def camera():
     t_end = time.time() + 10
 
     #Keep capturing till time over
-    while time.time() < t_end:
+    #while time.time() < t_end:
     # While cam is on
-    #while True:
+    while True:
         # Capture frame-by-frame
         ret, frame = video_capture.read()
         result = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=False)
@@ -61,7 +61,7 @@ def camera():
     # When everything is done, release the capture
     video_capture.release()
     cv2.destroyAllWindows()
-    return redirect('/')
+
 
 
 
@@ -75,19 +75,23 @@ def index():  # put application's code here
 def captureEmotion():
 
     if request.method == 'POST':
-        if request.form['cameraFunction'] == 'Capture':
-            return Response(camera(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-        elif request.form['cameraFunction'] == 'Stop':
+       if request.form['cameraFunction'] == 'Stop':
             return redirect('/results')
 
     else:
-        return render_template('index.html')
+        return Response(camera(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 
 @app.route('/results')
 def results():
+    video_capture.release()
+    cv2.destroyAllWindows()
+
+    if request.method == 'POST':
+       if request.form['cameraFunction'] == 'Capture':
+            return redirect('/emotion')
+
     return render_template('index.html')
 
 
