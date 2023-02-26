@@ -36,7 +36,7 @@ db = client.MusicEmotion
 
 # Create a collection called items on the database
 # Collections store a group of documents in MongoDB, like tables in relational databases.
-collectionItems = db.moods
+collectionMoods = db.moods
 
 
 #data = {'moods': ['sad','happy']}
@@ -100,10 +100,10 @@ def camera():
 @app.route('/', methods = ['GET','POST'])
 def index():  # put application's code here
 
-    #if request.method == 'POST':
-        #if request.form['cameraFunction'] == 'Stop':
+    if request.method == 'POST':
+        if request.form['cameraFunction'] == 'Stop':
             #return redirect('/results')
-            #return render_template('results.html')
+            return render_template('results.html')
 
     return render_template('index.html')
 
@@ -118,13 +118,18 @@ def captureEmotion():
 
 @app.route('/results')
 def results():
-    video_capture.release()
-    cv2.destroyAllWindows()
+    #video_capture.release()
+    #cv2.destroyAllWindows()
 
 
     #Get most shown emotion through the recording
     occurence_count = Counter(totalEmotion)
     print(occurence_count.most_common(1)[0])
+
+
+    previousEmotions = collectionMoods.collectionItems.find_one({"user": 'mike'})
+    print(previousEmotions)
+    #previousEmotions.update_one({'user': 'mike'}, {"$set": newEmotion})
 
 
     #if request.method == 'POST':
@@ -135,5 +140,5 @@ def results():
 
 
 if __name__ == '__main__':
-    #app.run()
-    app.run(host='127.0.0.1', port=8002, debug=True,threaded=True)
+    app.run()
+    #app.run(host='127.0.0.1', port=8002, debug=True,threaded=True)
