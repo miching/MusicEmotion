@@ -43,7 +43,9 @@ def camera():
         yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-
+    # When everything is done, release the capture
+    video_capture.release()
+    cv2.destroyAllWindows()
 
 
 

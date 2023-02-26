@@ -1,0 +1,14 @@
+body{
+    background-color: lightblue;
+    text-align: center;
+    font-family: sans-serif;
+    margin: 0;
+}
+
+input[type=submit]{
+    transition-duration: 1s;
+    background-color: lightgreen;
+    padding: 12px 20px;
+    font-size: 15px;
+
+}

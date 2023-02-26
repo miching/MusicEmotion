@@ -9,7 +9,12 @@
     <h1>Emotion Capture</h1>
     <div>
 
+        <link rel="stylesheet" href = "{{ url_for('static', filename = 'css/main.css') }}">
+
         <img src = '{{ url_for('captureEmotion') }}', width="50%">
+        <form action = '/'>
+            <input type = "submit", value = "Capture">
+        </form>
     </div>
 
 </body>
