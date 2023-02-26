@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, request
+from flask import Flask, render_template, Response, request, redirect
 import cv2
 import pathlib
 from deepface import DeepFace
@@ -9,11 +9,12 @@ app = Flask(__name__)
 cascPath = pathlib.Path(cv2.__file__).parent.absolute() / 'data/haarcascade_frontalface_default.xml'
 faceCascade = cv2.CascadeClassifier(str(cascPath))
 video_capture = cv2.VideoCapture(0)
+totalEmotion = []
 
 def camera():
 
     #Run for 10 seconds
-    t_end = time.time() + 20
+    t_end = time.time() + 10
 
     #Keep capturing till time over
     while time.time() < t_end:
@@ -42,10 +43,17 @@ def camera():
             cv2.putText(frame, result[0]['dominant_emotion'], (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12),
                         2)
 
+            totalEmotion.append(result[0]['dominant_emotion'])
+
         #cv2.imshow('Emotion', frame)
 
         ret, buffer = cv2.imencode('.jpg', frame)
         frame=buffer.tobytes()
+
+        if frame != None:
+            global_frame = frame
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
         yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -53,6 +61,8 @@ def camera():
     # When everything is done, release the capture
     video_capture.release()
     cv2.destroyAllWindows()
+    return redirect('/')
+
 
 
 
@@ -65,11 +75,20 @@ def index():  # put application's code here
 def captureEmotion():
 
     if request.method == 'POST':
-        return Response(camera(), mimetype='multipart/x-mixed-replace; boundary=frame')
+        if request.form['cameraFunction'] == 'Capture':
+            return Response(camera(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+        elif request.form['cameraFunction'] == 'Stop':
+            return redirect('/results')
 
     else:
-        return Response(camera(), mimetype='multipart/x-mixed-replace; boundary=frame')
+        return render_template('index.html')
 
+
+
+@app.route('/results')
+def results():
+    return render_template('index.html')
 
 
 if __name__ == '__main__':

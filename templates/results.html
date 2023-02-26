@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>EmotionMusic</title>
+    <title>Results</title>
 </head>
 <body>
 
-    <h1>Emotion Capture</h1>
+    <h1>Emotion Results</h1>
     <div>
 
         <link rel="stylesheet" href = "{{ url_for('static', filename = 'css/main.css') }}">
 
-        <img src = '{{ url_for('captureEmotion') }}', width="50%">
+
         <form action = '/emotion', method="POST">
             <input type = "submit", name = 'cameraFunction', value = "Capture">
             <input type = "submit", name = 'cameraFunction', value = "Stop">
