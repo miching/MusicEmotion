@@ -3,19 +3,30 @@ import cv2
 import pathlib
 from deepface import DeepFace
 import time
+from collections import Counter
+import pyrebase
+
+
 
 app = Flask(__name__)
 #Default training data provided by CV2 for facial recog
 cascPath = pathlib.Path(cv2.__file__).parent.absolute() / 'data/haarcascade_frontalface_default.xml'
 faceCascade = cv2.CascadeClassifier(str(cascPath))
 video_capture = cv2.VideoCapture(0)
+
+#Most shown emotion
 totalEmotion = []
+
+
+
+data = {'moods': ['sad','happy']}
+db.push(data)
 
 def camera():
 
     #Run for 10 seconds
     t_end = time.time() + 10
-
+    video_capture = cv2.VideoCapture(0)
     #Keep capturing till time over
     #while time.time() < t_end:
     # While cam is on
@@ -88,11 +99,17 @@ def results():
     video_capture.release()
     cv2.destroyAllWindows()
 
-    if request.method == 'POST':
-       if request.form['cameraFunction'] == 'Capture':
-            return redirect('/emotion')
 
-    return render_template('index.html')
+    #Get most shown emotion through the recording
+    occurence_count = Counter(totalEmotion)
+    print(occurence_count.most_common(1)[0][0])
+
+
+    #if request.method == 'POST':
+       #if request.form['cameraFunction'] == 'Capture':
+           #return redirect('/')
+
+    return render_template('results.html')
 
 
 if __name__ == '__main__':
